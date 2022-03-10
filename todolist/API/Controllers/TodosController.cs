@@ -71,13 +71,35 @@ namespace API.Controllers
         {
             token.ThrowIfCancellationRequested();
 
-            throw new NotImplementedException();
+            try
+            {
+                var todoItem = await this.todoRepository.PatchAsync(id, patchInfo, token).ConfigureAwait(false);
+                return this.Ok(todoItem);
+            }
+            catch (ValidationException ex)
+            {
+                return this.BadRequest(ex.Message);
+            }
+            catch (TodoNotFoundException)
+            {
+                return this.NotFound();
+            }
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(string id, CancellationToken token)
         {
-            throw new NotImplementedException();
+            token.ThrowIfCancellationRequested();
+
+            try
+            {
+                await this.todoRepository.RemoveAsync(id, token).ConfigureAwait(false);
+                return this.Ok();
+            }
+            catch (TodoNotFoundException)
+            {
+                return this.NotFound();
+            }
         }
     }
 }
